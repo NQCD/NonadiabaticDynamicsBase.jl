@@ -1,4 +1,4 @@
-using NonadiabaticDynamicsBase
+using NQCBase
 using Test, SafeTestsets
 
 @time @safetestset "Atoms tests" begin include("atoms.jl") end

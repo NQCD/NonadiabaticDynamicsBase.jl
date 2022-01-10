@@ -1,6 +1,6 @@
 
 using Test
-using NonadiabaticDynamicsBase
+using NQCBase
 using PyCall
 
 @testset "Single frame" begin

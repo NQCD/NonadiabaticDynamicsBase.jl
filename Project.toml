@@ -1,4 +1,4 @@
-name = "NonadiabaticDynamicsBase"
+name = "NQCBase"
 uuid = "78c76ebc-5665-4934-b512-82d81b5cbfb7"
 authors = ["James Gardner <james.gardner1421@gmail.com> and contributors"]
 version = "0.1.3"

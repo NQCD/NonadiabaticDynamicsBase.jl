@@ -1,5 +1,5 @@
 using Test
-using NonadiabaticDynamicsBase
+using NQCBase
 
 # 1D cells
 @test PeriodicCell(hcat(1)) isa PeriodicCell

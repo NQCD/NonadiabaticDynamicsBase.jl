@@ -1,5 +1,5 @@
 using Test
-using NonadiabaticDynamicsBase
+using NQCBase
 using StaticArrays
 
 atoms = Atoms{Float64}([:C, :H])

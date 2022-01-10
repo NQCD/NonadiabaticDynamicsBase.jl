@@ -1,4 +1,4 @@
-module NonadiabaticDynamicsBase
+module NQCBase
 
 using PeriodicTable
 using Unitful, UnitfulAtomic

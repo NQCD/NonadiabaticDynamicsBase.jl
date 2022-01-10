@@ -1,15 +1,15 @@
 
 using Test
-using NonadiabaticDynamicsBase
+using NQCBase
 
 atoms = Atoms([:H, :C, :O, :N])
 cell = PeriodicCell(rand(3, 3) .* 10)
 R = rand(3, 4) .* 10
 
 @testset "to/from_extxyz_dict" begin
-    dict = NonadiabaticDynamicsBase.to_extxyz_dict(atoms, R, cell)
+    dict = NQCBase.to_extxyz_dict(atoms, R, cell)
     @test dict["cell"] ≈ au_to_ang.(permutedims(cell.vectors, (2,1)))
-    natoms, nR, ncell = NonadiabaticDynamicsBase.from_extxyz_dict(dict)
+    natoms, nR, ncell = NQCBase.from_extxyz_dict(dict)
     @test ncell.vectors ≈ cell.vectors
     @test ncell.inverse ≈ cell.inverse
 end
