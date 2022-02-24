@@ -2,7 +2,6 @@ module NQCBase
 
 using PeriodicTable
 using Unitful, UnitfulAtomic
-using StaticArrays
 using Requires
 
 include("unit_conversions.jl")
