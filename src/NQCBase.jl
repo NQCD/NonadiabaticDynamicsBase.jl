@@ -13,4 +13,10 @@ function __init__()
     @require PyCall="438e738f-606a-5dbb-bf0a-cddfbfd45ab0" @eval include("io/ase.jl")
 end
 
+include("atoms_base.jl")
+export Cell
+export System
+export Trajectory
+export Position, Velocity
+
 end

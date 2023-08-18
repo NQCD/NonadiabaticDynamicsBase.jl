@@ -36,19 +36,20 @@ end
 
 Base.eltype(::PeriodicCell{T}) where {T} = T
 
-function PeriodicCell(vectors::AbstractMatrix{T}) where {T<:AbstractFloat}
-    PeriodicCell{T}(vectors, [true, true, true]) 
+function PeriodicCell(vectors::AbstractMatrix)
+    vectors = austrip.(vectors)
+    PeriodicCell{eltype(vectors)}(vectors, [true, true, true]) 
 end
 
 function PeriodicCell(vectors::AbstractMatrix{<:Integer})
     PeriodicCell{Float64}(vectors, [true, true, true]) 
 end
 
-function set_periodicity!(cell::PeriodicCell, periodicity::Vector{Bool})
+function set_periodicity!(cell::PeriodicCell, periodicity::AbstractVector{Bool})
     cell.periodicity .= periodicity
 end
 
-function set_vectors!(cell::PeriodicCell, vectors::Matrix)
+function set_vectors!(cell::PeriodicCell, vectors::AbstractMatrix)
     cell.vectors .= vectors
     cell.inverse .= inv(cell.vectors)
 end
