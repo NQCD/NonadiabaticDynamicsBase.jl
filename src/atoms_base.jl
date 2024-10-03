@@ -2,22 +2,22 @@ import AtomsBase
 using StaticArraysCore: SVector
 
 function NQCBase.Atoms(system::AtomsBase.AbstractSystem)
-    return NQCBase.Atoms(AtomsBase.atomic_symbol(system))
+    return NQCBase.Atoms(Symbol.(AtomsBase.atomic_symbol(system, :))) # AtomsBase requires an index to be given and doesn't return as Symbol any more.
 end
 
 function Cell(system::AtomsBase.AbstractSystem)
-    if AtomsBase.isinfinite(system)
+    if isa(AtomsBase.cell(system), AtomsBase.IsolatedCell)
         return NQCBase.InfiniteCell()
     else
         box = AtomsBase.bounding_box(system)
         cell = PeriodicCell(reduce(hcat, box))
-        NQCBase.set_periodicity!(cell, AtomsBase.periodicity(system))
+        NQCBase.set_periodicity!(cell, vcat(AtomsBase.periodicity(system)...))
         return cell
     end
 end
 
 function Position(system::AtomsBase.AbstractSystem)
-    r = AtomsBase.position(system)
+    r = AtomsBase.position(system, :)
     output = zeros(AtomsBase.n_dimensions(system), Base.length(system))
     for i in axes(output, 2)
         for j in axes(output, 1)
@@ -28,7 +28,7 @@ function Position(system::AtomsBase.AbstractSystem)
 end
 
 function Velocity(system::AtomsBase.AbstractSystem)
-    v = AtomsBase.velocity(system)
+    v = AtomsBase.velocity(system, :)
     output = zeros(AtomsBase.n_dimensions(system), Base.length(system))
     for i in axes(output, 2)
         for j in axes(output, 1)
@@ -95,7 +95,7 @@ end
 
 function build_system(atoms, cell::PeriodicCell)
     box = AtomsBase.bounding_box(cell)
-    bc = auconvertstrip.(u"Å", cell.vectors) # replacing AtomsBase.boundary_conditions bc they removed it
+    bc = (cell.periodicity...,) # PBC are now a Tuple{Bool} to make everything harder to use.
     return AtomsBase.atomic_system(atoms, box, bc)
 end
 
