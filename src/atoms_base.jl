@@ -1,4 +1,4 @@
-using AtomsBase: AtomsBase
+import AtomsBase
 using StaticArraysCore: SVector
 
 function NQCBase.Atoms(system::AtomsBase.AbstractSystem)
@@ -43,14 +43,6 @@ function AtomsBase.bounding_box(cell::PeriodicCell)
     return SVector{S}(auconvert.(u"Å", vec) for vec in eachcol(cell.vectors))
 end
 
-function AtomsBase.boundary_conditions(cell::PeriodicCell)
-    S = size(cell.vectors, 2)
-    return SVector{S}(
-        bc ? AtomsBase.Periodic() : AtomsBase.DirichletZero() for bc in cell.periodicity
-    )
-end
-AtomsBase.isinfinite(::PeriodicCell) = false
-AtomsBase.isinfinite(::InfiniteCell) = true
 
 function System(atoms::NQCBase.Atoms, position::AbstractMatrix, cell::AbstractCell=InfiniteCell())
     output_atoms = AtomsBaseAtoms(atoms, position)
@@ -97,14 +89,14 @@ function AtomsBaseAtoms(atoms::NQCBase.Atoms, position::AbstractMatrix, velocity
     return output_atoms
 end
 
-function build_system(atoms, cell)
-    if AtomsBase.isinfinite(cell)
-        return AtomsBase.isolated_system(atoms)
-    else
-        box = AtomsBase.bounding_box(cell)
-        bc = AtomsBase.boundary_conditions(cell)
-        return AtomsBase.atomic_system(atoms, box, bc)
-    end
+function build_system(atoms, cell::InfiniteCell)
+    return AtomsBase.isolated_system(atoms)
+end
+
+function build_system(atoms, cell::PeriodicCell)
+    box = AtomsBase.bounding_box(cell)
+    bc = auconvertstrip.(u"Å", cell.vectors) # replacing AtomsBase.boundary_conditions bc they removed it
+    return AtomsBase.atomic_system(atoms, box, bc)
 end
 
 function Trajectory(
