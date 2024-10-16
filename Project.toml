@@ -1,7 +1,7 @@
 name = "NQCBase"
 uuid = "78c76ebc-5665-4934-b512-82d81b5cbfb7"
 authors = ["James Gardner <james.gardner1421@gmail.com> and contributors"]
-version = "0.2.9"
+version = "0.2.10"
 
 [deps]
 AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
