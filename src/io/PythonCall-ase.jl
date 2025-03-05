@@ -25,7 +25,7 @@ function convert_to_ase_atoms(atoms::Atoms, R::Vector{<:Matrix}, cell::AbstractC
     convert_to_ase_atoms.(Ref(atoms), R, Ref(cell))
 end
 
-convert_from_ase_atoms(ase_atoms::Py) =
+convert_from_ase_atoms(ase_atoms::PythonCall.Py) =
     Atoms(ase_atoms), positions(ase_atoms), Cell(ase_atoms)
 
 Atoms(ase_atoms::PythonCall.Py) = Atoms{Float64}(Symbol.(PythonCall.PyList(ase_atoms.get_chemical_symbols())))
