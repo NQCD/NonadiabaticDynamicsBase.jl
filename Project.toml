@@ -15,9 +15,9 @@ Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 UnitfulAtomic = "a7773ee8-282e-5fa2-be4e-bd808c38a91a"
 
 [compat]
-AtomsBase = "0.3"
+AtomsBase = "0.4"
 Distances = "0.10"
-ExtXYZ = "0.1"
+ExtXYZ = "0.2"
 PeriodicTable = "1"
 PyCall = "1"
 Requires = "1"
