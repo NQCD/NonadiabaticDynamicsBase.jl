@@ -1,23 +1,23 @@
-import AtomsBase
+using AtomsBase: AtomsBase
 using StaticArraysCore: SVector
 
 function NQCBase.Atoms(system::AtomsBase.AbstractSystem)
-    return NQCBase.Atoms(Symbol.(AtomsBase.atomic_symbol(system, :))) # AtomsBase requires an index to be given and doesn't return as Symbol any more.
+    return NQCBase.Atoms(AtomsBase.atomic_symbol(system))
 end
 
 function Cell(system::AtomsBase.AbstractSystem)
-    if isa(AtomsBase.cell(system), AtomsBase.IsolatedCell)
+    if AtomsBase.isinfinite(system)
         return NQCBase.InfiniteCell()
     else
         box = AtomsBase.bounding_box(system)
         cell = PeriodicCell(reduce(hcat, box))
-        NQCBase.set_periodicity!(cell, vcat(AtomsBase.periodicity(system)...))
+        NQCBase.set_periodicity!(cell, AtomsBase.periodicity(system))
         return cell
     end
 end
 
 function Position(system::AtomsBase.AbstractSystem)
-    r = AtomsBase.position(system, :)
+    r = AtomsBase.position(system)
     output = zeros(AtomsBase.n_dimensions(system), Base.length(system))
     for i in axes(output, 2)
         for j in axes(output, 1)
@@ -28,7 +28,7 @@ function Position(system::AtomsBase.AbstractSystem)
 end
 
 function Velocity(system::AtomsBase.AbstractSystem)
-    v = AtomsBase.velocity(system, :)
+    v = AtomsBase.velocity(system)
     output = zeros(AtomsBase.n_dimensions(system), Base.length(system))
     for i in axes(output, 2)
         for j in axes(output, 1)
@@ -43,6 +43,14 @@ function AtomsBase.bounding_box(cell::PeriodicCell)
     return SVector{S}(auconvert.(u"Å", vec) for vec in eachcol(cell.vectors))
 end
 
+function AtomsBase.boundary_conditions(cell::PeriodicCell)
+    S = size(cell.vectors, 2)
+    return SVector{S}(
+        bc ? AtomsBase.Periodic() : AtomsBase.DirichletZero() for bc in cell.periodicity
+    )
+end
+AtomsBase.isinfinite(::PeriodicCell) = false
+AtomsBase.isinfinite(::InfiniteCell) = true
 
 function System(atoms::NQCBase.Atoms, position::AbstractMatrix, cell::AbstractCell=InfiniteCell())
     output_atoms = AtomsBaseAtoms(atoms, position)
@@ -89,14 +97,14 @@ function AtomsBaseAtoms(atoms::NQCBase.Atoms, position::AbstractMatrix, velocity
     return output_atoms
 end
 
-function build_system(atoms, cell::InfiniteCell)
-    return AtomsBase.isolated_system(atoms)
-end
-
-function build_system(atoms, cell::PeriodicCell)
-    box = AtomsBase.bounding_box(cell)
-    bc = (cell.periodicity...,) # PBC are now a Tuple{Bool} to make everything harder to use.
-    return AtomsBase.atomic_system(atoms, box, bc)
+function build_system(atoms, cell)
+    if AtomsBase.isinfinite(cell)
+        return AtomsBase.isolated_system(atoms)
+    else
+        box = AtomsBase.bounding_box(cell)
+        bc = AtomsBase.boundary_conditions(cell)
+        return AtomsBase.atomic_system(atoms, box, bc)
+    end
 end
 
 function Trajectory(
